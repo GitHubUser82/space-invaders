@@ -1,0 +1,29 @@
+# Enable Clang’s static analyzer:
+# catches use-after-free, null deref, leaks, etc.
+Checks: >
+  # Core static analysis (memory safety, undefined behavior, leaks)
+  clang-analyzer-*,
+
+  # Common C/C++ mistakes (logic errors, suspicious constructs)
+  bugprone-*,
+
+  # Cheap performance wins (copies, moves, loops)
+  performance-*,
+
+  # Prefer nullptr over 0 / NULL
+  modernize-use-nullptr,
+
+  # Ensure virtual overrides are explicit
+  modernize-use-override
+
+# Do not promote warnings to errors (editor + CI friendly)
+WarningsAsErrors: ''
+
+# Analyze all headers in the project
+HeaderFilterRegex: '.*'
+
+# Avoid noisy destructor lifetime diagnostics
+AnalyzeTemporaryDtors: false
+
+# Let the formatter decide style (clang-tidy won’t fight it)
+FormatStyle: none
