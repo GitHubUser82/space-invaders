@@ -40,8 +40,8 @@
 # debug information files
 *.dwo
 
-# CMake's build folder
-build/
+# CMake's build folders
+/build*/
 
 # Visual Studio Code
 .vscode/*

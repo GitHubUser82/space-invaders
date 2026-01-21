@@ -4,6 +4,9 @@ project(SpaceInvaders LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# This generates the compile_commands.json file used by clangd
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # GLFW
 find_package(glfw3 CONFIG REQUIRED)
 
