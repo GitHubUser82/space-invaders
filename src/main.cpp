@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #include <array>
+#include <random>
 
 /// @brief Minimum width of the program's window.
 static constexpr int WindowMinWidth = 640;
@@ -19,7 +20,7 @@ static constexpr int EmulatorFramebufferWidth = 256;
 static constexpr int EmulatorFramebufferHeight = 224;
 
 struct Pixel {
-    uint8_t r, g, b, a;
+    uint8_t r, g, b, a; // RGBA8 format
 };
 
 /// @brief The emulator's framebuffer.
@@ -60,9 +61,8 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-    /* This variable determines whether the screen black bands (that exist because the window's
-     * dimensions ratio may be different from the framebuffer's ratio) are horizontal or vertical.
-     */
+    // This variable determines whether the screen black bands (that exist because the window's
+    // dimensions ratio may be different from the framebuffer's ratio) are horizontal or vertical.
     float scale = std::min((float)width / EmulatorFramebufferWidth,
                            (float)height / EmulatorFramebufferHeight);
 
@@ -76,9 +76,14 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 }
 
 int main(void) {
+
     GLFWwindow *window;
+
+    // OpenGL variables
     GLuint vertex_array, vertex_buffer, element_array, texture, vertex_shader, fragment_shader,
         program;
+
+    /* GLFW (and glad) setup */
 
     glfwSetErrorCallback(error_callback);
 
@@ -88,7 +93,7 @@ int main(void) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-    window = glfwCreateWindow(WindowMinWidth, WindowMinHeight, "Simple example", NULL, NULL);
+    window = glfwCreateWindow(WindowMinWidth, WindowMinHeight, "Space Invaders", NULL, NULL);
     if (!window) {
         glfwTerminate();
         exit(EXIT_FAILURE);
@@ -106,7 +111,7 @@ int main(void) {
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    glClearColor(1, 0, 0, 1);
+    /* OpenGL context setup */
 
     glGenVertexArrays(1, &vertex_array);
     glBindVertexArray(vertex_array);
@@ -148,7 +153,31 @@ int main(void) {
 
     glUseProgram(program);
 
+    /* Random engine setup (to randomize the content of the framebuffer) */
+
+    // Seed source
+    std::random_device rd;
+
+    // Pseudo-random engine used
+    std::mt19937 gen(rd());
+
+    // Uniform distribution: inclusive range [0, 255]
+    std::uniform_int_distribution<int> dist(0, 255);
+
+    /* Main loop */
+
     while (!glfwWindowShouldClose(window)) {
+
+        // Fills the framebuffer with random colors
+        for (Pixel &p : framebuffer) {
+            p = {// dist(gen) uses gen to generate a random int in the range dist
+                 static_cast<uint8_t>(dist(gen)), static_cast<uint8_t>(dist(gen)),
+                 static_cast<uint8_t>(dist(gen)), 255};
+        }
+
+        // Updates the framebuffer texture already loaded
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, EmulatorFramebufferWidth, EmulatorFramebufferHeight,
+                        GL_RGBA, GL_UNSIGNED_BYTE, framebuffer.data());
 
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -157,6 +186,8 @@ int main(void) {
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    /* Termination code */
 
     glfwDestroyWindow(window);
 
