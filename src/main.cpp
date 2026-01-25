@@ -6,8 +6,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <iostream>
 #include <array>
 #include <random>
+
+
+#ifndef NDEBUG
+    #define LOG(x) do { std::cout << x << '\n'; } while (0)
+#else
+    #define LOG(x) do {} while (0)
+#endif
+
 
 /// @brief Minimum width of the program's window.
 static constexpr int WindowMinWidth = 640;
@@ -75,7 +84,31 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
 }
 
+// Windows GUI entry point
+#ifdef _WIN32
+#include <windows.h>
+
+int main();
+
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+{
+    return main();
+}
+#endif
+
 int main(void) {
+
+    // Open a console in Debug builds (this executable is GUI-only by default).
+    #ifdef _WIN32
+    #ifndef NDEBUG
+        AllocConsole();
+        FILE* fp;
+        freopen_s(&fp, "CONOUT$", "w", stdout);
+        freopen_s(&fp, "CONOUT$", "w", stderr);
+    #endif
+    #endif
+
+    LOG("Program started!");
 
     GLFWwindow *window;
 

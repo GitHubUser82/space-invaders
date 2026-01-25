@@ -14,7 +14,7 @@ find_package(glfw3 CONFIG REQUIRED)
 add_library(glad src/gl.c)
 target_include_directories(glad PUBLIC include)
 
-add_executable(${PROJECT_NAME}
+add_executable(${PROJECT_NAME} WIN32
     src/main.cpp
 )
 
