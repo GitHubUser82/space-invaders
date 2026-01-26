@@ -3,20 +3,21 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <iostream>
 #include <array>
-#include <random>
-
+#include <cstdio>
+#include <cstdlib>
+#include <iostream>
 
 #ifndef NDEBUG
-    #define LOG(x) do { std::cout << x << '\n'; } while (0)
+#define LOG(x)                                                                                     \
+    do {                                                                                           \
+        std::cout << x << '\n';                                                                    \
+    } while (0)
 #else
-    #define LOG(x) do {} while (0)
+#define LOG(x)                                                                                     \
+    do {                                                                                           \
+    } while (0)
 #endif
-
 
 /// @brief Minimum width of the program's window.
 static constexpr int WindowMinWidth = 640;
@@ -90,23 +91,20 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 
 int main();
 
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
-{
-    return main();
-}
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) { return main(); }
 #endif
 
 int main(void) {
 
-    // Open a console in Debug builds (this executable is GUI-only by default).
-    #ifdef _WIN32
-    #ifndef NDEBUG
-        AllocConsole();
-        FILE* fp;
-        freopen_s(&fp, "CONOUT$", "w", stdout);
-        freopen_s(&fp, "CONOUT$", "w", stderr);
-    #endif
-    #endif
+// Open a console in Debug builds (this executable is GUI-only by default).
+#ifdef _WIN32
+#ifndef NDEBUG
+    AllocConsole();
+    FILE *fp;
+    freopen_s(&fp, "CONOUT$", "w", stdout);
+    freopen_s(&fp, "CONOUT$", "w", stderr);
+#endif
+#endif
 
     LOG("Program started!");
 
@@ -186,27 +184,9 @@ int main(void) {
 
     glUseProgram(program);
 
-    /* Random engine setup (to randomize the content of the framebuffer) */
-
-    // Seed source
-    std::random_device rd;
-
-    // Pseudo-random engine used
-    std::mt19937 gen(rd());
-
-    // Uniform distribution: inclusive range [0, 255]
-    std::uniform_int_distribution<int> dist(0, 255);
-
     /* Main loop */
 
     while (!glfwWindowShouldClose(window)) {
-
-        // Fills the framebuffer with random colors
-        for (Pixel &p : framebuffer) {
-            p = {// dist(gen) uses gen to generate a random int in the range dist
-                 static_cast<uint8_t>(dist(gen)), static_cast<uint8_t>(dist(gen)),
-                 static_cast<uint8_t>(dist(gen)), 255};
-        }
 
         // Updates the framebuffer texture already loaded
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, EmulatorFramebufferWidth, EmulatorFramebufferHeight,
